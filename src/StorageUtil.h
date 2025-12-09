@@ -31,10 +31,11 @@ template <typename T, typename S> SInt32 ListFind(RE::StaticFunctionTag *base, R
 template <typename T, typename S> bool ListHas(RE::StaticFunctionTag *base, RE::TESForm *obj, RE::BSFixedString key, T value);
 template <typename T, typename S> void ListSort(RE::StaticFunctionTag *base, RE::TESForm *obj, RE::BSFixedString key);
 template <typename T, typename S>
-void ListSlice(RE::StaticFunctionTag *base, RE::TESForm *obj, RE::BSFixedString key, VMArray<T> &Output, UInt32 startIndex);
+void ListSlice(RE::StaticFunctionTag *base, RE::TESForm *obj, RE::BSFixedString key, RE::reference_array<T> Output, UInt32 startIndex);
 template <typename T, typename S>
 SInt32 ListResize(RE::StaticFunctionTag *base, RE::TESForm *obj, RE::BSFixedString key, UInt32 length, T filler);
-template <typename T, typename S> bool ListCopy(RE::StaticFunctionTag *base, RE::TESForm *obj, RE::BSFixedString key, VMArray<T> &Input);
+template <typename T, typename S>
+bool ListCopy(RE::StaticFunctionTag *base, RE::TESForm *obj, RE::BSFixedString key, RE::reference_array<T> Input);
 template <typename T, typename S> std::vector<T> ToArray(RE::StaticFunctionTag *base, RE::TESForm *obj, RE::BSFixedString key);
 
 // Debug functions
@@ -70,8 +71,9 @@ template <typename T> UInt32 FileListCount(RE::StaticFunctionTag *base, RE::BSFi
 template <typename T> SInt32 FileListFind(RE::StaticFunctionTag *base, RE::BSFixedString key, T value);
 template <typename T> bool FileListHas(RE::StaticFunctionTag *base, RE::BSFixedString key, T value);
 template <typename T> SInt32 FileListResize(RE::StaticFunctionTag *base, RE::BSFixedString key, UInt32 length, T filler);
-template <typename T> void FileListSlice(RE::StaticFunctionTag *base, RE::BSFixedString key, VMArray<T> &Output, UInt32 startIndex);
-template <typename T> bool FileListCopy(RE::StaticFunctionTag *base, RE::BSFixedString key, VMArray<T> &Input);
+template <typename T>
+void FileListSlice(RE::StaticFunctionTag *base, RE::BSFixedString key, RE::reference_array<T> Output, UInt32 startIndex);
+template <typename T> bool FileListCopy(RE::StaticFunctionTag *base, RE::BSFixedString key, RE::reference_array<T> Input);
 void SaveExternalFile(RE::StaticFunctionTag *base);
 #endif
 
