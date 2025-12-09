@@ -33,3 +33,5 @@ BuildLog.htm
 
 # cmake
 build/*
+/dist
+/temp

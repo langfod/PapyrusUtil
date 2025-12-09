@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "dependencies": [
+    "boost-algorithm",
+    "boost-container",
+    "boost-filesystem",
+    "boost-random",
+    "directxmath",
+    "directxtk",
+    "rapidcsv",
+    "jsoncpp",
+    "fmt",
+    {
+      "name": "spdlog",
+      "features": ["wchar"]
+    }
+  ],
+  "overrides": [
+    {
+      "name": "fmt",
+      "version": "10.2.1"
+    }
+  ]
+}
