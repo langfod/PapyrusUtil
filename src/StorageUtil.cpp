@@ -493,7 +493,7 @@ template <typename T> T FileSetValue(StaticFunctionTag *base, BSFixedString key,
 template <typename T> T FileGetValue(StaticFunctionTag *base, BSFixedString key, T missing) {
   ExternalFile *File = GetSingleton();
   if (!File || !IsValidKey(key))
-    return Empty<T>();
+    return missing;
   else
     return ParseValue<T>(File->GetValue(Type<T>(), key.data(), MakeValue<T>(missing)));
 }
