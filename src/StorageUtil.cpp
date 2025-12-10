@@ -487,7 +487,7 @@ template <typename T> T FileSetValue(StaticFunctionTag *base, BSFixedString key,
   if (!File || !IsValidKey(key))
     return Empty<T>();
   else
-    return ParseValue<T>(File->SetValue(List<T>(), key.data(), MakeValue<T>(value)));
+    return ParseValue<T>(File->SetValue(Type<T>(), key.data(), MakeValue<T>(value)));
 }
 
 template <typename T> T FileGetValue(StaticFunctionTag *base, BSFixedString key, T missing) {
@@ -495,7 +495,7 @@ template <typename T> T FileGetValue(StaticFunctionTag *base, BSFixedString key,
   if (!File || !IsValidKey(key))
     return Empty<T>();
   else
-    return ParseValue<T>(File->GetValue(List<T>(), key.data(), MakeValue<T>(missing)));
+    return ParseValue<T>(File->GetValue(Type<T>(), key.data(), MakeValue<T>(missing)));
 }
 
 template <typename T> T FileAdjustValue(StaticFunctionTag *base, BSFixedString key, T value) {
@@ -503,7 +503,7 @@ template <typename T> T FileAdjustValue(StaticFunctionTag *base, BSFixedString k
   if (!File || !IsValidKey(key))
     return Empty<T>();
   else
-    return ParseValue<T>(File->AdjustValue(List<T>(), key.data(), MakeValue<T>(value)));
+    return ParseValue<T>(File->AdjustValue(Type<T>(), key.data(), MakeValue<T>(value)));
 }
 
 template <typename T> bool FileUnsetValue(StaticFunctionTag *base, BSFixedString key) {
@@ -511,7 +511,7 @@ template <typename T> bool FileUnsetValue(StaticFunctionTag *base, BSFixedString
   if (!File || !IsValidKey(key))
     return false;
   else
-    return File->UnsetValue(List<T>(), key.data());
+    return File->UnsetValue(Type<T>(), key.data());
 }
 
 template <typename T> bool FileHasValue(StaticFunctionTag *base, BSFixedString key) {
@@ -519,7 +519,7 @@ template <typename T> bool FileHasValue(StaticFunctionTag *base, BSFixedString k
   if (!File || !IsValidKey(key))
     return false;
   else
-    return File->HasValue(List<T>(), key.data());
+    return File->HasValue(Type<T>(), key.data());
 }
 
 template <typename T> SInt32 FileListAdd(StaticFunctionTag *base, BSFixedString key, T value, bool allowDuplicate) {
@@ -755,22 +755,20 @@ void StorageUtil::RegisterFuncs(RE::BSScript::IVirtualMachine *vm) {
   vm->RegisterFunction("StringListSort"sv, "StorageUtil"sv, ListSort<BSFixedString, std::string>);
   vm->RegisterFunction("FormListSort"sv, "StorageUtil"sv, ListSort<TESForm *, UInt32>);
 
-  // TODO: These functions use reference_array which requires special handling for CommonLibSSE-NG
-  // vm->RegisterFunction("IntListSlice"sv, "StorageUtil"sv, ListSlice<SInt32, SInt32>);
-  // vm->RegisterFunction("FloatListSlice"sv, "StorageUtil"sv, ListSlice<float, float>);
-  // vm->RegisterFunction("StringListSlice"sv, "StorageUtil"sv, ListSlice<BSFixedString, std::string>);
-  // vm->RegisterFunction("FormListSlice"sv, "StorageUtil"sv, ListSlice<TESForm *, UInt32>);
+  vm->RegisterFunction("IntListSlice"sv, "StorageUtil"sv, ListSlice<SInt32, SInt32>);
+  vm->RegisterFunction("FloatListSlice"sv, "StorageUtil"sv, ListSlice<float, float>);
+  vm->RegisterFunction("StringListSlice"sv, "StorageUtil"sv, ListSlice<BSFixedString, std::string>);
+  vm->RegisterFunction("FormListSlice"sv, "StorageUtil"sv, ListSlice<TESForm *, UInt32>);
 
   vm->RegisterFunction("IntListResize"sv, "StorageUtil"sv, ListResize<SInt32, SInt32>);
   vm->RegisterFunction("FloatListResize"sv, "StorageUtil"sv, ListResize<float, float>);
   vm->RegisterFunction("StringListResize"sv, "StorageUtil"sv, ListResize<BSFixedString, std::string>);
   vm->RegisterFunction("FormListResize"sv, "StorageUtil"sv, ListResize<TESForm *, UInt32>);
 
-  // TODO: These functions use reference_array which requires special handling for CommonLibSSE-NG
-  // vm->RegisterFunction("IntListCopy"sv, "StorageUtil"sv, ListCopy<SInt32, SInt32>);
-  // vm->RegisterFunction("FloatListCopy"sv, "StorageUtil"sv, ListCopy<float, float>);
-  // vm->RegisterFunction("StringListCopy"sv, "StorageUtil"sv, ListCopy<BSFixedString, std::string>);
-  // vm->RegisterFunction("FormListCopy"sv, "StorageUtil"sv, ListCopy<TESForm *, UInt32>);
+  vm->RegisterFunction("IntListCopy"sv, "StorageUtil"sv, ListCopy<SInt32, SInt32>);
+  vm->RegisterFunction("FloatListCopy"sv, "StorageUtil"sv, ListCopy<float, float>);
+  vm->RegisterFunction("StringListCopy"sv, "StorageUtil"sv, ListCopy<BSFixedString, std::string>);
+  vm->RegisterFunction("FormListCopy"sv, "StorageUtil"sv, ListCopy<TESForm *, UInt32>);
 
   vm->RegisterFunction("IntListToArray"sv, "StorageUtil"sv, ToArray<SInt32, SInt32>);
   vm->RegisterFunction("FloatListToArray"sv, "StorageUtil"sv, ToArray<float, float>);
@@ -1125,17 +1123,15 @@ void StorageUtil::RegisterFuncs(RE::BSScript::IVirtualMachine *vm) {
   vm->RegisterFunction("FileStringListResize"sv, "StorageUtil"sv, FileListResize<BSFixedString>);
   vm->RegisterFunction("FileFormListResize"sv, "StorageUtil"sv, FileListResize<TESForm *>);
 
-  // TODO: These functions use reference_array which requires special handling for CommonLibSSE-NG
-  // vm->RegisterFunction("FileIntListSlice"sv, "StorageUtil"sv, FileListSlice<SInt32>);
-  // vm->RegisterFunction("FileFloatListSlice"sv, "StorageUtil"sv, FileListSlice<float>);
-  // vm->RegisterFunction("FileStringListSlice"sv, "StorageUtil"sv, FileListSlice<BSFixedString>);
-  // vm->RegisterFunction("FileFormListSlice"sv, "StorageUtil"sv, FileListSlice<TESForm *>);
+  vm->RegisterFunction("FileIntListSlice"sv, "StorageUtil"sv, FileListSlice<SInt32>);
+  vm->RegisterFunction("FileFloatListSlice"sv, "StorageUtil"sv, FileListSlice<float>);
+  vm->RegisterFunction("FileStringListSlice"sv, "StorageUtil"sv, FileListSlice<BSFixedString>);
+  vm->RegisterFunction("FileFormListSlice"sv, "StorageUtil"sv, FileListSlice<TESForm *>);
 
-  // TODO: These functions use reference_array which requires special handling for CommonLibSSE-NG
-  // vm->RegisterFunction("FileIntListCopy"sv, "StorageUtil"sv, FileListCopy<SInt32>);
-  // vm->RegisterFunction("FileFloatListCopy"sv, "StorageUtil"sv, FileListCopy<float>);
-  // vm->RegisterFunction("FileStringListCopy"sv, "StorageUtil"sv, FileListCopy<BSFixedString>);
-  // vm->RegisterFunction("FileFormListCopy"sv, "StorageUtil"sv, FileListCopy<TESForm *>);
+  vm->RegisterFunction("FileIntListCopy"sv, "StorageUtil"sv, FileListCopy<SInt32>);
+  vm->RegisterFunction("FileFloatListCopy"sv, "StorageUtil"sv, FileListCopy<float>);
+  vm->RegisterFunction("FileStringListCopy"sv, "StorageUtil"sv, FileListCopy<BSFixedString>);
+  vm->RegisterFunction("FileFormListCopy"sv, "StorageUtil"sv, FileListCopy<TESForm *>);
 
   vm->RegisterFunction("SaveExternalFile"sv, "StorageUtil"sv, SaveExternalFile);
 
