@@ -1,0 +1,38 @@
+# commonlibsse.cmake - Setup for SKSE plugin using CommonLibSSE-NG submodule
+
+# CommonLibSSE-NG configuration
+set(CommonLibPath "external/commonlibsse-ng")
+set(CommonLibName "CommonLibSSE")
+
+# Save original build type
+set(_saved_build_type "${CMAKE_BUILD_TYPE}")
+
+# Always build CommonLibSSE in Release mode to disable assertions and enable optimizations
+set(COMMONLIBSSE_BUILD_TYPE "Release" CACHE STRING "Build type for CommonLibSSE" FORCE)
+
+# Disable CommonLibSSE tests when building as subdirectory
+set(BUILD_TESTS OFF CACHE BOOL "Disable CommonLibSSE tests" FORCE)
+
+# Check if CommonLibSSE has already been built
+set(COMMONLIB_STAMP_FILE "${BUILD_ROOT}/external_builds/${CommonLibName}.stamp")
+# Add CommonLibSSE-NG as a subdirectory with EXCLUDE_FROM_ALL
+add_subdirectory(${CommonLibPath} "${BUILD_ROOT}/external_builds/${CommonLibName}" EXCLUDE_FROM_ALL)
+
+# Configure CommonLibSSE target with specific definitions (must be after add_subdirectory)
+if(TARGET ${CommonLibName})
+    target_compile_definitions(${CommonLibName} PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        NDEBUG
+    )
+endif()
+
+# Create stamp file after configuration (informational only)
+if(NOT EXISTS ${COMMONLIB_STAMP_FILE})
+    file(WRITE ${COMMONLIB_STAMP_FILE} "Configured on ${CMAKE_SYSTEM_NAME}")
+endif()
+
+# Include the CommonLibSSE helper cmake functions (provides add_commonlibsse_plugin macro)
+include(${CommonLibPath}/cmake/CommonLibSSE.cmake)
+
+# Restore original build type for the main project
+set(CMAKE_BUILD_TYPE "${_saved_build_type}")

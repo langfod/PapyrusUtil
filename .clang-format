@@ -1,0 +1,7 @@
+---
+# Project clang-format rules
+# We set only ColumnLimit here so everything else follows the default
+BasedOnStyle: LLVM
+ColumnLimit: 140
+---
+

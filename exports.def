@@ -1,3 +1,0 @@
-LIBRARY	"PapyrusUtil"
-EXPORTS
-SKSEPlugin_Load
