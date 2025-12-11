@@ -2,3 +2,4 @@
 	path = external/commonlibsse-ng
 	url = https://github.com/alandtse/CommonLibVR.git
 	branch = ng
+	commit = 76e9358840701aa31c93b4451916ffdf4afbb861
