@@ -37,7 +37,7 @@ extern "C" {
 
 		0,
 		SKSEPluginVersionData::kVersionIndependent_StructsPost629,
-		{ RUNTIME_VERSION_1_6_1130, 0 },
+		{ RUNTIME_VERSION_1_7_99, 0 },
 
 		0,	// works with any version of the script extender. you probably do not need to put anything here
 	};
@@ -56,7 +56,7 @@ extern "C" {
 		gLog.OpenRelative(CSIDL_MYDOCUMENTS, "\\My Games\\Skyrim Special Edition\\SKSE\\PapyrusUtilDev.log");
 		gLog.SetPrintLevel(IDebugLog::kLevel_DebugMessage);
 		gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
-		//_MESSAGE("Loading Version: %d", (int)PAPYRUSUTIL_VERSION);
+		_MESSAGE("Loading Version: %d", (int)PAPYRUSUTIL_VERSION);
 
 		// Initialize offsets with address library
 		if (!Plugin::InitializeOffsets()) {
