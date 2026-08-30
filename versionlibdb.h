@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 #include <fstream>
 #include <stdio.h>
 #include <Windows.h>
@@ -11,11 +12,12 @@ class VersionDb
 {
 public:
 	VersionDb() { Clear(); }
-	~VersionDb() { }
+	~VersionDb() {}
 
 private:
 	std::map<unsigned long long, unsigned long long> _data;
 	std::map<unsigned long long, unsigned long long> _rdata;
+	std::vector<unsigned int> _denseData;
 	int _ver[4];
 	std::string _verStr;
 	std::string _moduleName;
@@ -38,7 +40,7 @@ private:
 	{
 		return (unsigned long long)ptr;
 	}
-	
+
 	static bool ParseVersionFromString(const char* ptr, int& major, int& minor, int& revision, int& build)
 	{
 		return sscanf_s(ptr, "%d.%d.%d.%d", &major, &minor, &revision, &build) == 4 && ((major != 1 && major != 0) || minor != 0 || revision != 0 || build != 0);
@@ -69,6 +71,15 @@ public:
 
 	bool FindOffsetById(unsigned long long id, unsigned long long& result) const
 	{
+		if (!_denseData.empty())
+		{
+			if (id >= _denseData.size() || _denseData[(size_t)id] == 0)
+				return false;
+
+			result = _denseData[(size_t)id];
+			return true;
+		}
+
 		auto itr = _data.find(id);
 		if (itr != _data.end())
 		{
@@ -90,6 +101,19 @@ public:
 
 	bool FindIdByOffset(unsigned long long offset, unsigned long long& result) const
 	{
+		if (!_denseData.empty())
+		{
+			for (size_t id = 0; id < _denseData.size(); ++id)
+			{
+				if (_denseData[id] == offset)
+				{
+					result = id;
+					return true;
+				}
+			}
+			return false;
+		}
+
 		auto itr = _rdata.find(offset);
 		if (itr == _rdata.end())
 			return false;
@@ -115,7 +139,7 @@ public:
 			if (GetFileVersionInfo(szVersionFile, verHandle, verSize, verData))
 			{
 				{
-					char * vstr = NULL;
+					char* vstr = NULL;
 					UINT vlen = 0;
 					if (VerQueryValueA(verData, "\\StringFileInfo\\040904B0\\ProductVersion", (LPVOID*)&vstr, &vlen) && vlen && vstr && *vstr)
 					{
@@ -128,7 +152,7 @@ public:
 				}
 
 				{
-					char * vstr = NULL;
+					char* vstr = NULL;
 					UINT vlen = 0;
 					if (VerQueryValueA(verData, "\\StringFileInfo\\040904B0\\FileVersion", (LPVOID*)&vstr, &vlen) && vlen && vstr && *vstr)
 					{
@@ -159,6 +183,7 @@ public:
 	{
 		_data.clear();
 		_rdata.clear();
+		_denseData.clear();
 		for (int i = 0; i < 4; i++) _ver[i] = 0;
 		_moduleName = std::string();
 		_base = 0;
@@ -167,7 +192,7 @@ public:
 	bool Load()
 	{
 		int major, minor, revision, build;
-		
+
 		if (!GetExecutableVersion(major, minor, revision, build))
 			return false;
 
@@ -187,6 +212,45 @@ public:
 
 		int format = read<int>(file);
 
+		if (format == 5)
+		{
+			for (int i = 0; i < 4; i++)
+				_ver[i] = (int)read<unsigned int>(file);
+
+			{
+				char moduleName[64] = {};
+				file.read(moduleName, sizeof(moduleName));
+				_moduleName.assign(moduleName, strnlen_s(moduleName, sizeof(moduleName)));
+			}
+
+			const int ptrSize = read<int>(file);
+			const int dataFormat = read<int>(file);
+			const int offsetCount = read<int>(file);
+			if (!file.good() || ptrSize != sizeof(void*) || dataFormat != 0 || offsetCount <= 0 || offsetCount > 0x1000000)
+			{
+				Clear();
+				return false;
+			}
+
+			_denseData.resize((size_t)offsetCount);
+			file.read(reinterpret_cast<char*>(_denseData.data()), (std::streamsize)(_denseData.size() * sizeof(unsigned int)));
+			if (!file.good())
+			{
+				Clear();
+				return false;
+			}
+
+			{
+				char verName[64];
+				_snprintf_s(verName, 64, "%d.%d.%d.%d", _ver[0], _ver[1], _ver[2], _ver[3]);
+				_verStr = verName;
+			}
+
+			HMODULE handle = GetModuleHandleA(_moduleName.empty() ? NULL : _moduleName.c_str());
+			_base = (unsigned long long)handle;
+			return true;
+		}
+
 		if (format != 2)
 			return false;
 
@@ -204,7 +268,7 @@ public:
 		if (tnLen < 0 || tnLen >= 0x10000)
 			return false;
 
-		if(tnLen > 0)
+		if (tnLen > 0)
 		{
 			char* tnbuf = (char*)malloc(tnLen + 1);
 			file.read(tnbuf, tnLen);
